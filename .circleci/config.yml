@@ -4,7 +4,6 @@ orbs:
   node: circleci/node@5.0.1
   docker: circleci/docker@2.1
 
-
 jobs:
   build:
     docker:
@@ -16,6 +15,7 @@ jobs:
       - run: |
           echo "Install dependencies"
           npm install
+
   test:
     docker: 
       - image: cimg/node:16.10
@@ -26,20 +26,18 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
+
   build-and-push:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
       - setup_remote_docker
-      - docker/login:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
       - docker/build:
           image: khairula86/education-space:latest
+          tags: "latest"
       - docker/push:
           image: khairula86/education-space:latest
-
 
 workflows:
   simple_workflow:
