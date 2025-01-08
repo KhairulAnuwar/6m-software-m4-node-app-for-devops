@@ -28,19 +28,19 @@ jobs:
           npm run test
   build-and-push:
     docker:
-      - image: cimg/node:16.10
+      - image: cimg/base:stable
     steps:
-      - setup_remote_docker
       - checkout
+      - setup_remote_docker
       - docker/login:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
-      - run: |
+      - docker/build:
           echo "Building Docker Image"
-          docker build -t education-space/your-app:latest .
-      - run: |
+          image: khairula86/education-space:latest
+      - docker/push:
           echo "Pushing Docker Image"
-          docker push education-space/your-app:latest
+          image: khairula86/education-space:latest
 
 
 workflows:
