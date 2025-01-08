@@ -15,9 +15,8 @@ jobs:
       - run: |
           echo "Install dependencies"
           npm install
-
   test:
-    docker: 
+    docker:
       - image: cimg/node:16.10
     steps:
       - checkout
@@ -26,26 +25,30 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-
   build-and-push:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
+          docker_layer_caching: true
+      - docker/login:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
       - docker/build:
           image: khairula86/education-space
-          tag: latest
+          tags: latest
       - docker/push:
           image: khairula86/education-space
-          tag: latest
+          tags: latest
 
 workflows:
   simple_workflow:
     jobs:
       - build
       - test:
-          requires: 
+          requires:
             - build
       - build-and-push:
           requires:
