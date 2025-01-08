@@ -36,10 +36,8 @@ jobs:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
       - docker/build:
-          echo "Building Docker Image"
           image: khairula86/education-space:latest
       - docker/push:
-          echo "Pushing Docker Image"
           image: khairula86/education-space:latest
 
 
