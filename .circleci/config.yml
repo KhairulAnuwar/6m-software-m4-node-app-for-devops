@@ -33,16 +33,12 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - docker/login:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
       - docker/build:
           image: khairula86/education-space
-          tag: latest
+          tags: "latest"
       - docker/push:
           image: khairula86/education-space
-          tag: latest
-
+          tags: "latest"
 workflows:
   simple_workflow:
     jobs:
