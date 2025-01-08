@@ -35,10 +35,11 @@ jobs:
       - setup_remote_docker
       - docker/build:
           image: khairula86/education-space
-          tags: "latest"
+          tag: latest
       - docker/push:
           image: khairula86/education-space
-          tags: "latest"
+          tag: latest
+
 workflows:
   simple_workflow:
     jobs:
