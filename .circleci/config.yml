@@ -37,6 +37,7 @@ jobs:
           name: Heroku Container Push
           command: |
             heroku container:login
+            heroku stack:set container -a khairul-su-devops
             heroku container:push web -a khairul-su-devops
             heroku container:release web -a khairul-su-devops
 
