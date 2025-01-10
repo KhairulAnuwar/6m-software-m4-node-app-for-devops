@@ -47,6 +47,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
+      - setup_remote_docker  # Add this step
       - heroku/install
       - checkout
       - run:
