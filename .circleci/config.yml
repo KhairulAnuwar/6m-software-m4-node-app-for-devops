@@ -29,13 +29,10 @@ jobs:
 
   build-and-push:
     docker:
-      - image: cimg/docker:stable
+      - image: cimg/base:stable
     steps:
-      - setup_remote_docker
       - checkout
-      - run:
-          name: Verify Docker Daemon
-          command: docker version
+      - setup_remote_docker
       - run:
           name: Build Docker Image
           command: |
@@ -48,12 +45,8 @@ jobs:
 
   deploy:
     docker:
-      - image: cimg/docker:stable
+      - image: cimg/base:stable
     steps:
-      - setup_remote_docker
-      - run:
-          name: Verify Docker Daemon
-          command: docker version
       - heroku/install
       - checkout
       - run:
