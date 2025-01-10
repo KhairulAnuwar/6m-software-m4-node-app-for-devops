@@ -65,19 +65,15 @@ workflows:
       - build:
           filters:
             branches:
-              only: main
+              only: 
+                - main
+                - release
       - test:
           filters:
             branches:
-              only: main
-      - build:
-          filters:
-            branches:
-              only: release
-      - test:
-          filters:
-            branches:
-              only: release
+              only: 
+                - main
+                - release
       - publish:
           filters:
             branches:
@@ -86,3 +82,5 @@ workflows:
           filters:
             branches:
               only: release
+
+
