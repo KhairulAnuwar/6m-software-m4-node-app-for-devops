@@ -60,7 +60,7 @@ jobs:
 
 workflows:
   version: 2
-  conditional_workflow:
+  release_workflow:
     jobs:
       - build:
           filters:
