@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   heroku: circleci/heroku@2.0.0
-  docker: circleci/docker@2.1.4
 
 jobs:
   build:
@@ -34,12 +33,15 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - docker/build:
-          image: khairula86/education-space
-          tags: latest
-      - docker/push:
-          image: khairula86/education-space
-          tags: latest
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t khairula86/education-space:latest .
+      - run:
+          name: Push Docker Image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker push khairula86/education-space:latest
 
   deploy:
     docker:
