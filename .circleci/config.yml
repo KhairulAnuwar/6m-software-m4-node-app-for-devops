@@ -12,9 +12,9 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-      - run: |
-          echo "Install dependencies"
-          npm install
+      - run:
+          name: Install Dependencies
+          command: npm install
 
   test:
     docker:
@@ -23,11 +23,11 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-      - run: |
-          echo "Running tests"
-          npm run test
+      - run:
+          name: Run Tests
+          command: npm run test
 
-  build-and-push:
+  publish:
     docker:
       - image: cimg/base:stable
     steps:
@@ -47,11 +47,11 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
-      - setup_remote_docker  # Add this step
+      - setup_remote_docker
       - heroku/install
       - checkout
       - run:
-          name: Heroku Container Push
+          name: Deploy to Heroku
           command: |
             heroku container:login
             heroku stack:set container -a khairul-su-devops
@@ -59,15 +59,30 @@ jobs:
             heroku container:release web -a khairul-su-devops
 
 workflows:
-  simple_workflow:
+  version: 2
+  conditional_workflow:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only: main
       - test:
-          requires:
-            - build
-      - build-and-push:
-          requires:
-            - test
+          filters:
+            branches:
+              only: main
+      - build:
+          filters:
+            branches:
+              only: release
+      - test:
+          filters:
+            branches:
+              only: release
+      - publish:
+          filters:
+            branches:
+              only: release
       - deploy:
-          requires:
-            - build-and-push
+          filters:
+            branches:
+              only: release
