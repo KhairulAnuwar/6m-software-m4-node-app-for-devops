@@ -60,7 +60,7 @@ jobs:
 
 workflows:
   version: 2
-    conditional_workflow:
+  conditional_workflow:
     jobs:
       - build:
           filters:
@@ -82,5 +82,3 @@ workflows:
           filters:
             branches:
               only: release
-
-
