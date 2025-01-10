@@ -26,9 +26,21 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
+  build-and-push:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          image: khairula86/education-space
+          tags: latest
+      - docker/push:
+          image: khairula86/education-space
+          tags: latest
   deploy:
     docker:
-      - image: cimg/node:16.10
+      - image: cimg/base:stable
     steps:
       - setup_remote_docker
       - heroku/install
@@ -40,9 +52,6 @@ jobs:
             heroku stack:set container -a khairul-su-devops
             heroku container:push web -a khairul-su-devops
             heroku container:release web -a khairul-su-devops
-
-
-
 workflows:
   simple_workflow:
     jobs:
@@ -50,6 +59,10 @@ workflows:
       - test:
           requires: 
             - build
+     - build-and-push:
       - deploy:
           requires:
             - test
+     - deploy:
+          requires:
+            - build-and-push
