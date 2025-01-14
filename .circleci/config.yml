@@ -1,10 +1,121 @@
+# version: 2.1
+
+# orbs:
+#   node: circleci/node@5.0.1
+#   heroku: circleci/heroku@2.0.0
+#   snyk: snyk/snyk@1.5.0
+
+
+# jobs:
+#   build:
+#     docker:
+#       - image: cimg/node:16.10
+#     steps:
+#       - checkout
+#       - node/install-packages:
+#           pkg-manager: npm
+#       - run:
+#           name: Install Dependencies
+#           command: npm install
+
+#   test:
+#     docker:
+#       - image: cimg/node:16.10
+#     steps:
+#       - checkout
+#       - node/install-packages:
+#           pkg-manager: npm
+#       - run:
+#           name: Run Tests
+#           command: npm run test
+
+#   publish:
+#     docker:
+#       - image: cimg/base:stable
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: Build Docker Image
+#           command: |
+#             docker build -t khairula86/education-space:latest .
+#       - run:
+#           name: Push Docker Image
+#           command: |
+#             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#             docker push khairula86/education-space:latest
+
+#   deploy:
+#     docker:
+#       - image: cimg/base:stable
+#     steps:
+#       - setup_remote_docker
+#       - heroku/install
+#       - checkout
+#       - run:
+#           name: Deploy to Heroku
+#           command: |
+#             heroku container:login
+#             heroku stack:set container -a khairul-su-devops
+#             heroku container:push web -a khairul-su-devops
+#             heroku container:release web -a khairul-su-devops
+
+#   scan:
+#     docker:
+#       - image: cimg/node:16.10
+#     environment:
+#       IMAGE_NAME: khairula86/education-space
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - docker/check
+#       - run: docker build -t $IMAGE_NAME .
+#       - snyk/scan: 
+#           docker-image-name: $IMAGE_NAME
+  
+
+
+# workflows:
+#   version: 2
+#   conditional_workflow:
+#     jobs:
+#       - build:
+#           filters:
+#             branches:
+#               only: 
+#                 - main
+#                 - release
+#       - test:
+#           filters:
+#             branches:
+#               only: 
+#                 - main
+#                 - release
+                
+#       - publish:
+#           filters:
+#             branches:
+#               only: release
+#       # - deploy:
+#       #     filters:
+#       #       branches:
+#       #         only: release
+
+#       - scan:
+#           requires:
+#             - build
+#       - test:
+#           requires: 
+#             - scan
+
+
 version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
   heroku: circleci/heroku@2.0.0
   snyk: snyk/snyk@1.5.0
-
+  docker: circleci/docker@2.0.1  # Add the docker orb
 
 jobs:
   build:
@@ -72,8 +183,6 @@ jobs:
       - run: docker build -t $IMAGE_NAME .
       - snyk/scan: 
           docker-image-name: $IMAGE_NAME
-  
-
 
 workflows:
   version: 2
@@ -91,16 +200,10 @@ workflows:
               only: 
                 - main
                 - release
-                
       - publish:
           filters:
             branches:
               only: release
-      # - deploy:
-      #     filters:
-      #       branches:
-      #         only: release
-
       - scan:
           requires:
             - build
