@@ -1,121 +1,8 @@
-# # version: 2.1
-
-# # orbs:
-# #   node: circleci/node@5.0.1
-# #   heroku: circleci/heroku@2.0.0
-# #   snyk: snyk/snyk@1.5.0
-
-
-# # jobs:
-# #   build:
-# #     docker:
-# #       - image: cimg/node:16.10
-# #     steps:
-# #       - checkout
-# #       - node/install-packages:
-# #           pkg-manager: npm
-# #       - run:
-# #           name: Install Dependencies
-# #           command: npm install
-
-# #   test:
-# #     docker:
-# #       - image: cimg/node:16.10
-# #     steps:
-# #       - checkout
-# #       - node/install-packages:
-# #           pkg-manager: npm
-# #       - run:
-# #           name: Run Tests
-# #           command: npm run test
-
-# #   publish:
-# #     docker:
-# #       - image: cimg/base:stable
-# #     steps:
-# #       - checkout
-# #       - setup_remote_docker
-# #       - run:
-# #           name: Build Docker Image
-# #           command: |
-# #             docker build -t khairula86/education-space:latest .
-# #       - run:
-# #           name: Push Docker Image
-# #           command: |
-# #             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-# #             docker push khairula86/education-space:latest
-
-# #   deploy:
-# #     docker:
-# #       - image: cimg/base:stable
-# #     steps:
-# #       - setup_remote_docker
-# #       - heroku/install
-# #       - checkout
-# #       - run:
-# #           name: Deploy to Heroku
-# #           command: |
-# #             heroku container:login
-# #             heroku stack:set container -a khairul-su-devops
-# #             heroku container:push web -a khairul-su-devops
-# #             heroku container:release web -a khairul-su-devops
-
-# #   scan:
-# #     docker:
-# #       - image: cimg/node:16.10
-# #     environment:
-# #       IMAGE_NAME: khairula86/education-space
-# #     steps:
-# #       - checkout
-# #       - setup_remote_docker
-# #       - docker/check
-# #       - run: docker build -t $IMAGE_NAME .
-# #       - snyk/scan: 
-# #           docker-image-name: $IMAGE_NAME
-  
-
-
-# # workflows:
-# #   version: 2
-# #   conditional_workflow:
-# #     jobs:
-# #       - build:
-# #           filters:
-# #             branches:
-# #               only: 
-# #                 - main
-# #                 - release
-# #       - test:
-# #           filters:
-# #             branches:
-# #               only: 
-# #                 - main
-# #                 - release
-                
-# #       - publish:
-# #           filters:
-# #             branches:
-# #               only: release
-# #       # - deploy:
-# #       #     filters:
-# #       #       branches:
-# #       #         only: release
-
-# #       - scan:
-# #           requires:
-# #             - build
-# #       - test:
-# #           requires: 
-# #             - scan
-
-
 # version: 2.1
 
 # orbs:
 #   node: circleci/node@5.0.1
 #   heroku: circleci/heroku@2.0.0
-#   snyk: snyk/snyk@1.5.0
-#   docker: circleci/docker@2.0.1  # Add the docker orb
 
 # jobs:
 #   build:
@@ -171,19 +58,6 @@
 #             heroku container:push web -a khairul-su-devops
 #             heroku container:release web -a khairul-su-devops
 
-#   scan:
-#     docker:
-#       - image: cimg/node:16.10
-#     environment:
-#       IMAGE_NAME: khairula86/education-space
-#     steps:
-#       - checkout
-#       - setup_remote_docker
-#       - docker/check
-#       - run: docker build -t $IMAGE_NAME .
-#       - snyk/scan: 
-#           docker-image-name: $IMAGE_NAME
-
 # workflows:
 #   version: 2
 #   conditional_workflow:
@@ -200,80 +74,86 @@
 #               only: 
 #                 - main
 #                 - release
+                
 #       - publish:
 #           filters:
 #             branches:
 #               only: release
-#       - scan:
-#           requires:
-#             - build
-#       - test:
-#           requires: 
-#             - scan
-
-
-
+#       - deploy:
+#           filters:
+#             branches:
+#               only: release
 
 
 version: 2.1
 
-# Importing orbs for Docker and Heroku
 orbs:
-  docker: circleci/docker@2.1.1
-  # heroku: circleci/heroku@3.0.1
+  node: circleci/node@5.0.1
+  heroku: circleci/heroku@2.0.0
+  docker: circleci/docker@2.1.4
+  snyk: snyk/snyk@1.5.0
 
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: cimg/node:16.10
     steps:
       - checkout
-      - setup_remote_docker
-      - run:
-          name: Build with Maven Wrapper
-          command: ./mvnw clean package
-
+      - node/install-packages:
+          pkg-manager: npm
+      - run: |
+          echo "Install dependencies"
+          npm install
   test:
-    docker:
-      - image: circleci/openjdk:11-jdk
+    docker: 
+      - image: cimg/node:16.10
     steps:
       - checkout
-      - run:
-          name: Run Tests
-          command: ./mvnw test
-  dockerize:
+      - node/install-packages:
+          pkg-manager: npm
+      - run: |
+          echo "Running tests"
+          npm run test
+  deploy:
     docker:
-      - image: circleci/openjdk:11-jdk  # Java-based image for Dockerization
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku stack:set container -a jonathan-su-devops
+            heroku container:push web -a jonathan-su-devops
+            heroku container:release web -a jonathan-su-devops
+  scan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: jonnywony/education-space
     steps:
       - checkout
       - setup_remote_docker
-      - docker/build:
-          # name: SCTP Group 1 Docker Assignment
-          image: khairula86/sctpgrp1dockerassignment
-          tag: latest
-          
-workflows:
-  version: 2
-  ci_flow:
-    when:
-      branches:
-        only:
-          - develop
-    jobs:
-      - build
-      - test
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  
 
-  cicd_flow:
-    when:
-      branches:
-        only:
-          - release
+
+
+workflows:
+  simple_workflow:
     jobs:
       - build
-      - test
-      - dockerize:
+      # - deploy:
+      #     requires:
+      #       - test
+      - scan:
           requires:
-            - test
-      - deploy:
-          requires:
-            - dockerizegit 
+            - build
+      - test:
+          requires: 
+            - scan
