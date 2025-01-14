@@ -171,18 +171,14 @@ jobs:
   
 
 
-
 workflows:
   simple_workflow:
     jobs:
       - build
-      # - deploy:
-      #     requires:
-      #       - test
       - scan:
           requires:
             - build
-       - codescan:
+      - codescan:
           requires:
             - build
       - test:
