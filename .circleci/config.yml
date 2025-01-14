@@ -3,6 +3,8 @@
 # orbs:
 #   node: circleci/node@5.0.1
 #   heroku: circleci/heroku@2.0.0
+#   snyk: snyk/snyk@1.5.0
+
 
 # jobs:
 #   build:
@@ -57,6 +59,19 @@
 #             heroku stack:set container -a khairul-su-devops
 #             heroku container:push web -a khairul-su-devops
 #             heroku container:release web -a khairul-su-devops
+
+#   scan:
+#     docker: 
+#       - image: cimg/node:16.10
+#     environment:
+#       IMAGE_NAME: khairula86/education-space
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - docker/check
+#       - run: docker build -t $IMAGE_NAME .
+#       - snyk/scan: 
+#           docker-image-name: $IMAGE_NAME
 
 # workflows:
 #   version: 2
@@ -125,14 +140,14 @@ jobs:
           name: Heroku Container Push
           command: |
             heroku container:login
-            heroku stack:set container -a jonathan-su-devops
-            heroku container:push web -a jonathan-su-devops
-            heroku container:release web -a jonathan-su-devops
+            heroku stack:set container -a khairul-su-devops
+            heroku container:push web -a khairul-su-devops
+            heroku container:release web -a khairul-su-devops
   scan:
     docker: 
       - image: cimg/node:16.10
     environment:
-      IMAGE_NAME: jonnywony/education-space
+      IMAGE_NAME: khairula86/education-space
     steps:
       - checkout
       - setup_remote_docker
