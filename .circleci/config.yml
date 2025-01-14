@@ -3,6 +3,8 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   heroku: circleci/heroku@2.0.0
+  snyk: snyk/snyk@1.5.0
+
 
 jobs:
   build:
@@ -58,6 +60,21 @@ jobs:
             heroku container:push web -a khairul-su-devops
             heroku container:release web -a khairul-su-devops
 
+  scan:
+    docker:
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: khairula86/education-space
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  
+
+
 workflows:
   version: 2
   conditional_workflow:
@@ -79,9 +96,14 @@ workflows:
           filters:
             branches:
               only: release
-      - deploy:
-          filters:
-            branches:
-              only: release
+      # - deploy:
+      #     filters:
+      #       branches:
+      #         only: release
 
-
+      - scan:
+          requires:
+            - build
+      - test:
+          requires: 
+            - scan
